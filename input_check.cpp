@@ -59,4 +59,31 @@ bool check_double_float_input(const std::string& s) {
     }
     return true;
 }
+bool englishAlnum_imput(const std::string& s) {
+    if (s.empty()) return false;
+    char c = s[0];
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c == '-') || (c == '_') || (c == '.');
+}
 
+void filteredInput_letter_numbers(std::string& s, bool maskInput) {
+    s.clear();
+
+    while (true) {
+        int c = _getch();
+        std::string charAsString(1, static_cast<char>(c));
+
+        if (englishAlnum_imput(charAsString) && s.size() < MAX_DIGITS) {
+            s += static_cast<char>(c);
+            std::cout << (maskInput ? '*' : static_cast<char>(c));
+        }
+
+        if (c == BACKSPACE && !s.empty()) {
+            s.pop_back();
+            std::cout << "\b \b";
+        }
+        else if (c == ENTER && !s.empty()) {
+            std::cout << std::endl;
+            return;
+        }
+    }
+}
