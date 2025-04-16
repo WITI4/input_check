@@ -38,9 +38,28 @@ bool check_unsigned_input(const std::string& s) {
     return s.length() < MAX_INT32.length() || (s.length() == MAX_INT32.length() && s <= MAX_INT32);
 }
 bool check_int_input(const std::string& s) {
+    if (s.empty()) return false;
+    bool has_point = false;
+    for (size_t i = 0; i < s.size(); i++) {
+        if (s[i] == '-') {
+            if (i != 0) return false;
+        }
+        else if (!isdigit(s[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+bool check_onlyNegative_int_input(const std::string& s) {
     if (s.empty() || s[0] != '-') return false;
     std::string num = s.substr(1);
     return num.length() < MIN_INT32.length() || (num.length() == MIN_INT32.length() && num <= MIN_INT32);
+}
+bool check_onlyPositive_int_input(const std::string& s) {
+    if (s.empty()) return false;
+    if (s[0] == '-') return false;
+    if (!(s.begin(), s.end(), ::isdigit)) return false;
+    return s.length() < MAX_INT32.length() || (s.length() == MAX_INT32.length() && s <= MAX_INT32);
 }
 bool check_double_float_input(const std::string& s) {
     if (s.empty()) return false;
@@ -70,11 +89,16 @@ void filteredInput_letter_numbers(std::string& s, bool maskInput) {
 
     while (true) {
         int c = _getch();
-        std::string charAsString(1, static_cast<char>(c));
+        std::string charAsString(1, (char)c);
+
+        if (c == 0 || c == 0xE0) {
+            _getch();
+            continue;
+        }
 
         if (englishAlnum_imput(charAsString) && s.size() < MAX_DIGITS) {
-            s += static_cast<char>(c);
-            std::cout << (maskInput ? '*' : static_cast<char>(c));
+            s += (char)c;
+            std::cout << (maskInput ? '*' : (char)c);
         }
 
         if (c == BACKSPACE && !s.empty()) {

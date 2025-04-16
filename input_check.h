@@ -13,13 +13,15 @@ double Stod(const std::string& s);
 
 bool check_unsigned_input(const std::string& s);
 bool check_int_input(const std::string& s);
+bool check_onlyNegative_int_input(const std::string& s);
+bool check_onlyPositive_int_input(const std::string& s);
 bool check_double_float_input(const std::string& s);
 bool englishAlnum_imput(const std::string& s);
 
 void filteredInput_letter_numbers(std::string& s, bool maskInput = false);
 
 template <typename T>
-bool is_valid_number(T& num) {
+bool is_valid_number(T& num, bool requireNegative = false, bool requirePositive = false) {
     std::string buf;
 
     while (true) {
@@ -35,7 +37,17 @@ bool is_valid_number(T& num) {
         else if constexpr (std::is_same_v<T, int>) {
             if ((isdigit(c) || (c == '-' && buf.empty())) && buf.size() < MAX_DIGITS) {
                 buf += c;
-                if (check_int_input(buf)) std::cout << (char)c;
+                bool isValid = false;
+                if (requireNegative) {
+                    isValid = check_onlyNegative_int_input(buf);
+                }
+                else if (requirePositive) {
+                    isValid = check_onlyPositive_int_input(buf);
+                }
+                else {
+                    isValid = check_int_input(buf);
+                }
+                if (isValid) std::cout << (char)c;
                 else buf.pop_back();
             }
         }
