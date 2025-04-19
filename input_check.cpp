@@ -34,21 +34,25 @@ double Stod(const std::string& s) {
 }
 
 bool check_unsigned_input(const std::string& s) {
-    if (s.empty()) return false;
-    return s.length() < MAX_INT32.length() || (s.length() == MAX_INT32.length() && s <= MAX_INT32);
+    if (s.empty() || s.size() > MAX_DIGITS) return false;
+    for (char c : s) if (!isdigit(c)) return false;
+    return s.size() < MAX_INT32.size() || (s.size() == MAX_INT32.size() && s <= MAX_INT32);
 }
 bool check_int_input(const std::string& s) {
-    if (s.empty()) return false;
-    bool has_point = false;
-    for (size_t i = 0; i < s.size(); i++) {
-        if (s[i] == '-') {
-            if (i != 0) return false;
-        }
-        else if (!isdigit(s[i])) {
-            return false;
-        }
+    if (s.empty() || s.size() > MAX_DIGITS) return false;
+    size_t i = 0;
+    bool negative = false;
+
+    if (s[0] == '-') {
+        i++;
+        negative = true;
     }
-    return true;
+    for (; i < s.size(); i++) if (!isdigit(s[i])) return false;
+
+    if (negative) {
+        return s.size() - 1 < MIN_INT32.size() || (s.size() - 1 == MIN_INT32.size() && s.substr(1) <= MIN_INT32);
+    }
+    return s.size() < MAX_INT32.size() || (s.size() == MAX_INT32.size() && s <= MAX_INT32);
 }
 bool check_onlyNegative_int_input(const std::string& s) {
     if (s.empty() || s[0] != '-') return false;
@@ -63,14 +67,15 @@ bool check_onlyPositive_int_input(const std::string& s) {
 }
 bool check_double_float_input(const std::string& s) {
     if (s.empty()) return false;
-    bool has_point = false;
-    for (size_t i = 0; i < s.size(); i++) {
-        if (s[i] == '-') {
-            if (i != 0) return false;
-        }
-        else if (s[i] == '.' && s[0] != '.') {
-            if (has_point) return false;
-            has_point = true;
+    size_t i = 0;
+    bool dotFound = false;
+
+    if (s[0] == '-') i++;
+
+    for (; i < s.size(); i++) {
+        if (s[i] == '.') {
+            if (dotFound) return false;
+            dotFound = true;
         }
         else if (!isdigit(s[i])) {
             return false;
@@ -78,36 +83,70 @@ bool check_double_float_input(const std::string& s) {
     }
     return true;
 }
-bool englishAlnum_imput(const std::string& s) {
+
+bool check_englishLetters_specSymbols_input(const std::string& s) {
     if (s.empty()) return false;
     char c = s[0];
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c == '-') || (c == '_') || (c == '.');
 }
-
-void filteredInput_letter_numbers(std::string& s, bool maskInput) {
-    s.clear();
-
-    while (true) {
-        int c = _getch();
-        std::string charAsString(1, (char)c);
-
-        if (c == 0 || c == 0xE0) {
-            _getch();
-            continue;
-        }
-
-        if (englishAlnum_imput(charAsString) && s.size() < MAX_DIGITS) {
-            s += (char)c;
-            std::cout << (maskInput ? '*' : (char)c);
-        }
-
-        if (c == BACKSPACE && !s.empty()) {
-            s.pop_back();
-            std::cout << "\b \b";
-        }
-        else if (c == ENTER && !s.empty()) {
-            std::cout << std::endl;
-            return;
-        }
-    }
+bool check_russian_englishLetters_input(const std::string& s) {
+    if (s.empty()) return false;
+    char c = s[0];
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z' || c >= 'à' && c <= 'ÿ') || (c >= 'À' && c <= 'ß');
 }
+bool check_englishLetters_input(const std::string& s) {
+    if (s.empty()) return false;
+    char c = s[0];
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+
+//==============DEBUG==============
+/*
+unsigned a;
+int b;
+double value;
+float d;
+std::string str;
+
+std::cout << "<unsigned>: ";
+number_filteredInput<unsigned>(a);
+std::cout << a << "\n\n";
+
+std::cout << "<int>: ";
+number_filteredInput<int>(b);
+std::cout << b << "\n\n";
+
+std::cout << "<-int>: ";
+number_filteredInput<int>(b, 1);
+std::cout << b << "\n\n";
+
+std::cout << "<+int>: ";
+number_filteredInput<int>(b, 0, 1);
+std::cout << b << "\n\n";
+
+std::cout << "<double>: ";
+number_filteredInput<double>(value);
+std::cout << value << "\n\n";
+
+std::cout << "<float>: ";
+number_filteredInput<float>(d);
+std::cout << d << "\n\n\n\n";
+
+
+std::cout << "<string (english + '-' +'_' + 1-9)>: ";
+letter_filteredInput<std::string>(str);
+std::cout << str << "\n\n";
+
+std::cout << "<only english>: ";
+letter_filteredInput<std::string>(str, 1);
+std::cout << str << "\n\n";
+
+std::cout << "<english + russian>: ";
+letter_filteredInput<std::string>(str, 0, 1);
+std::cout << str << "\n\n";
+
+std::cout << "<*>: ";
+letter_filteredInput<std::string>(str, 0, 0, 1);
+std::cout << str << "\n\n";
+*/
